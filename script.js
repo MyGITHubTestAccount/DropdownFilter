@@ -7,17 +7,18 @@ define( [ 	// Note: If you load .js files, omit the file extension, otherwise
 			'text!./bootstrap-select.min.css',
 			'./bootstrap-select.min',
 			'qlik'
-		
-
 		],
 
-    	function ($, properties, cssBootstrap, jsBootstrap, cssBootstrapSelect, jsBootstrapSelect, qlik) { // include dependency arguments, give them shortnames in the sequence listed under define[]  
+    	function ($, properties, cssBootstrap, jsBootstrap, cssBootstrapSelect, jsBootstrapSelect, qlik) { 
+    		// include dependency arguments, give them shortnames in the sequence listed under define[]  
     
         	'use strict';
 
         	// use the Mashup API for building a list instead of a hypercube which seems to be the default in the extension API
         	var $currApp = qlik.currApp( this );
 
+
+        	// define various functions that we will use in the return function
         	var writeToConsole = function(){
 				for(var i=0; i<arguments.length; i++) {
 					console.log( 'Argument [' + i + '] --> ');
@@ -56,15 +57,7 @@ define( [ 	// Note: If you load .js files, omit the file extension, otherwise
 					},
 					function(reply) {
 
-						buildSelect(reply, command);
-						
-						// let selectpicker beautify (=modify) the complete <SELECT> list
-						$('.selectpicker').selectpicker();
-						$('.selectpicker').hide();
-						console.log( 'selectpicker hidden' );							
-						$('.selectpicker').show();
-						console.log( 'selectpicker shown' );
-
+						buildSelect(reply, command);						
 					}
 						); // end createList 
 			}
@@ -83,42 +76,31 @@ define( [ 	// Note: If you load .js files, omit the file extension, otherwise
 						$.each(reply.qListObject.qDataPages[0].qMatrix, function(key, value) {
 							$optionList += '<option>' + value[0].qText + '</option>' ;
 						});	 
-					case 'sort':
-					case 'update':  
 					default:
 						$.each(reply.qListObject.qDataPages[0].qMatrix, function(key, value) {
 							$optionList += '<option>' + value[0].qText + '</option>' ;
 						}); 
 				}
 
-				// if(command == 'create') {
-				// 	$.each(reply.qListObject.qDataPages[0].qMatrix, function(key, value) {
-				// 		$optionList += '<option>' + value[0].qText + '</option>' ;
-				// 	});	
-				// }
-
-				
-				console.log( 'optionList' );
-				console.log( $optionList );
-
 				// add the entire <SELECT> plus <OPTION>'s' dropdown to the DOM inside the boostrapped div's
 				$( '.bootstrap_inside' ).append( $selectTag + $selectTagOptions + $optionList + '</select>' );
+				writeToConsole($selectTag, $selectTagOptions, $optionList);
 			}
 
-			var paintDropdown = function(){
-				
+			var showDropdown = function(){
 				$('.selectpicker').selectpicker();
-				$('.selectpicker').hide();
-				console.log( 'selectpicker hidden' );							
-				$('.selectpicker').show();
-				console.log( 'selectpicker shown' );
+				//$('.selectpicker').hide();
+				// writeToConsole('selectpicker hidden');
+				// $('.selectpicker').show();
+				writeToConsole('selectpicker shown');			
 			}
     
+    		// start extension
         	return {
 
-					definition: properties, //returns the contents of properties.js
+					definition: properties, //returns the contents of properties.js to paint the right side panel for the extension
 
-		            // paint and rendering logic
+		            // rendering logic
 		            paint: function ( $element, layout ) {
 
 				       	// writeToConsole($element, layout);
@@ -126,23 +108,20 @@ define( [ 	// Note: If you load .js files, omit the file extension, otherwise
 						// Solve the "multiply problem" - Lazy way
 						$element.empty();
 						
-						// load bootstrap into HTML header and crate a scoped bootstrap div so that bootrap does not mess up the sense client. 
+						// load bootstrap into HTML header and create a scoped bootstrap div to avoid messing up the sense client. 
 						addCSS(cssBootstrap);
-						addCSS(cssBootstrapSelect);
+						addCSS(cssBootstrapSelect); //for selectpicker
 						addBootstrapDiv($element);
 
-						// get the data
+						// build and show the dropdown the data
 						buildDropdown('Alpha',0,0,100,1, 'create');
+						showDropdown();
 
-						// let selectpicker beautify (=modify) the complete <SELECT> list and insert it into the DOM
-						paintDropdown();
-						
-    	
-		           	} //end paint and rendering logic
+		           	} //end rendering logic
 
-        	}; //end return
+        	}; //end extension
 
-		} // end function ( /* dependency arguments */ )
+		} // end dependency arguments 
 
 ); // end define
 
