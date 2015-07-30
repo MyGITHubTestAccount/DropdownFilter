@@ -1,0 +1,9 @@
+{
+  "name": "My Javascript Extension",
+  "description": "My 1st Extension Object",
+  "preview": "icon.png",
+  "icon": "extension",
+  "type": "visualization",
+  "version": "0.1",
+  "author": "Stefan Sonntag"
+}
